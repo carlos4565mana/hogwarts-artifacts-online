@@ -1,10 +1,14 @@
 package com.carlos.springbootcurse.artifact;
 
+import com.carlos.springbootcurse.artifact.dto.ArtifactDto;
 import com.carlos.springbootcurse.system.StatusCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.ArrayList;
@@ -26,6 +31,9 @@ class ArtifactControllerTest {
     MockMvc mockMvc;
     @MockBean
     ArtifactService artifactService;
+
+    @Autowired
+    ObjectMapper objectMapper;
     List<Artifact> artifacts;
 
     @BeforeEach
@@ -120,6 +128,37 @@ class ArtifactControllerTest {
                         .andExpect(jsonPath("$.data[0].name").value("Deluminator"))
                         .andExpect(jsonPath("$.data[1].id").value("1250808601744904192"))
                         .andExpect(jsonPath("$.data[1].name").value("Invisibility Cloak"));
+
+    }
+    @Test
+    void testAddArtifactSuccess() throws Exception {
+        //Given
+        ArtifactDto artifactDto = new ArtifactDto(
+                null,
+                "Invisibility Cloak",
+                "An invisibility cloak is used to make the wearer invisible.",
+                "ImageUrl",
+                null );
+        String json = this.objectMapper.writeValueAsString(artifactDto);
+
+        Artifact savedArtifact = new Artifact();
+        savedArtifact.setId("1250808601744904192");
+        savedArtifact.setName("Invisibility Cloak");
+        savedArtifact.setDescription("An invisibility cloak is used to make the wearer invisible.");
+        savedArtifact.setImageUrl("ImageUrl");
+
+        given(this.artifactService.save(Mockito.any(Artifact.class))).willReturn(savedArtifact);
+
+
+        //When Then
+        this.mockMvc.perform(post("/api/v1/artifacts").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Add Success"))
+                .andExpect(jsonPath("$.data.id").isNotEmpty())
+                .andExpect(jsonPath("$.data.name").value(savedArtifact.getName()))
+                .andExpect(jsonPath("$.data.description").value(savedArtifact.getDescription()))
+                .andExpect(jsonPath("$.data.imageUrl").value(savedArtifact.getImageUrl()));
 
     }
 
