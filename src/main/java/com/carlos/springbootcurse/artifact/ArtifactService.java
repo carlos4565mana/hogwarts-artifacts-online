@@ -18,10 +18,12 @@ public class ArtifactService {
         this.idWorker = idWorker;
     }
 
+
     public Artifact findById(String artifactId){
         return this.artifactRepository.findById(artifactId)
                 .orElseThrow(()->new ArtifactNotFoundException(artifactId));
     }
+
     public List<Artifact> findAll(){
         return this.artifactRepository.findAll();
     }
@@ -30,6 +32,7 @@ public class ArtifactService {
 
         return this.artifactRepository.save(newArtifact);
     }
+    
     public Artifact update(String artifactId, Artifact update){
       return this.artifactRepository.findById(artifactId)
               .map(oldArtifact -> {
