@@ -50,6 +50,14 @@ public class ArtifactController {
         ArtifactDto savedArtifactDto = this.artifactToArtifactDtoConverter.convert(savedArtifact);
         return new Result(true, StatusCode.SUCCESS,"Add Success", savedArtifactDto);
     }
+    @PutMapping("/api/v1/artifacts/{artifactId}")
+    public Result updateArtifact(@PathVariable String artifactId, @Valid @RequestBody ArtifactDto artifactDto ){
+       Artifact update = this.artifactDtoToArtifacConverter.convert(artifactDto);
+       Artifact updatedArtifact = this.artifactService.update(artifactId, update);
+       ArtifactDto updatedArtifactDto = this.artifactToArtifactDtoConverter.convert(updatedArtifact);
+        return  new Result(true, StatusCode.SUCCESS, "Updated Success", updatedArtifactDto);
+    }
+
 
 }
 
