@@ -16,4 +16,5 @@ public class SpringBootCurseApplication {
 		return  new IdWorker(1,1);
 	}
 
+	
 }
