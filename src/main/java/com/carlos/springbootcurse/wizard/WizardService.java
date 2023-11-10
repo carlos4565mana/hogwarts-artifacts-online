@@ -34,5 +34,12 @@ public class WizardService {
                     return this.wizardRepository.save(oldWizard);
                 }).orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
     }
+    public void delete(Integer wizardId){
+        Wizard wizardToBeDeleted = this.wizardRepository.findById(wizardId)
+                .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
+        wizardToBeDeleted.removeAllArtifacts();
+        this.wizardRepository.deleteById(wizardId);
+
+    }
 
 }

@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class WizardServiceTest {
@@ -157,4 +156,33 @@ class WizardServiceTest {
         verify(this.wizardRepository, times(1)).findById(1);
 
     }
+    @Test
+    void testDeleteSuccess(){
+        // Given
+        Wizard wizard = new Wizard();
+        wizard.setId(1);
+        wizard.setName("Albus Dumbledore");
+
+        given(this.wizardRepository.findById(1)).willReturn(Optional.of(wizard));
+        doNothing().when(this.wizardRepository).deleteById(1);
+
+        // When
+        this.wizardService.delete(1);
+
+        // Then
+        verify(this.wizardRepository, times(1)).deleteById(1);
+    }
+    @Test
+    void testDeleteNotFound(){
+        // Given
+        given(this.wizardRepository.findById(1)).willReturn(Optional.empty());
+        // When
+        assertThrows(ObjectNotFoundException.class, () -> {
+            this.wizardService.delete(1);
+        });
+        // Then
+        verify(this.wizardRepository, times(1)).findById(1);
+
+    }
+
 }
