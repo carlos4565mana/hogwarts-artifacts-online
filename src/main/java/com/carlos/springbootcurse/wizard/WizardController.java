@@ -5,10 +5,8 @@ import com.carlos.springbootcurse.system.StatusCode;
 import com.carlos.springbootcurse.wizard.converter.WizardDtoToWizardConverter;
 import com.carlos.springbootcurse.wizard.converter.WizardToWizardDtoConverter;
 import com.carlos.springbootcurse.wizard.dto.WizardDto;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,5 +40,12 @@ public class WizardController {
                 .map(this.wizardToWizardDtoConverter::convert)
                 .collect(Collectors.toList());
         return new Result(true, StatusCode.SUCCESS, "Find All Success", wizardDtos);
+    }
+    @PostMapping
+    public Result addWizard(@Valid @RequestBody WizardDto wizardDto){
+        Wizard newWizard = this.wizardDtoToWizardConverter.convert(wizardDto);
+        Wizard savedWizard = this.wizardService.save(newWizard);
+        WizardDto savedWizardDto = this.wizardToWizardDtoConverter.convert(savedWizard);
+        return new Result(true, StatusCode.SUCCESS, "Add Success", savedWizardDto);
     }
 }

@@ -103,4 +103,19 @@ class WizardServiceTest {
         // Verify wizardRepository.findAll() is called exactly once.
         verify(this.wizardRepository, times(1)).findAll();
     }
+
+    @Test
+    void testSaveSuccess(){
+        // Given
+        Wizard newWizard = new Wizard();
+        newWizard.setName("Hermione Granger");
+        given(this.wizardRepository.save(newWizard)).willReturn(newWizard);
+
+        // When
+        Wizard returnedWizard = this.wizardService.save(newWizard);
+
+        // Then
+        assertThat(returnedWizard.getName()).isEqualTo(newWizard.getName());
+        verify(this.wizardRepository, times(1)).save(newWizard);
+    }
 }

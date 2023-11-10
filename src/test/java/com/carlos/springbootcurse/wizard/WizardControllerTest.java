@@ -3,10 +3,14 @@ package com.carlos.springbootcurse.wizard;
 import com.carlos.springbootcurse.artifact.Artifact;
 import com.carlos.springbootcurse.system.StatusCode;
 import com.carlos.springbootcurse.system.exception.ObjectNotFoundException;
+import com.carlos.springbootcurse.wizard.dto.WizardDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -28,6 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class WizardControllerTest {
     @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
     @MockBean
     WizardService wizardService;
 
@@ -141,5 +148,27 @@ class WizardControllerTest {
                 .andExpect(jsonPath("$.data[0].name").value("Albus Dumbledore"))
                 .andExpect(jsonPath("$.data[1].id").value(2))
                 .andExpect(jsonPath("$.data[1].name").value("Harry Potter"));
+    }
+    @Test
+    void testAddWizardSuccess() throws Exception {
+        WizardDto wizardDto = new WizardDto(null, "Hermione Granger", 0);
+
+        String json = this.objectMapper.writeValueAsString(wizardDto);
+
+        Wizard savedWizard = new Wizard();
+        savedWizard.setId(4);
+        savedWizard.setName("Hermione Granger");
+
+        // Given. Arrange inputs and targets. Define the behavior of Mock object wizardService.
+        given(this.wizardService.save(Mockito.any(Wizard.class))).willReturn(savedWizard);
+
+        // When and then
+        this.mockMvc.perform(post("/api/v1/wizards").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Add Success"))
+                .andExpect(jsonPath("$.data.id").isNotEmpty())
+                .andExpect(jsonPath("$.data.name").value("Hermione Granger"));
+
     }
 }
