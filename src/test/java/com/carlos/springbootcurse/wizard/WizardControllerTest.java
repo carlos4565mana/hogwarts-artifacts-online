@@ -18,6 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.ArrayList;
@@ -169,6 +171,48 @@ class WizardControllerTest {
                 .andExpect(jsonPath("$.message").value("Add Success"))
                 .andExpect(jsonPath("$.data.id").isNotEmpty())
                 .andExpect(jsonPath("$.data.name").value("Hermione Granger"));
+    }
+    @Test
+    void testUpdateWizardSuccess() throws Exception {
+        WizardDto wizardDto = new WizardDto(null, "Updated wizard name", 0);
+
+        Wizard updatedWizard = new Wizard();
+        updatedWizard.setId(1);
+        updatedWizard.setName("Updated wizard name");
+
+        String json = this.objectMapper.writeValueAsString(updatedWizard);
+
+        // Given. Arrange inputs and targets. Define the behavior of Mock object wizardService.
+        given(this.wizardService.update(eq(1), Mockito.any(Wizard.class))).willReturn(updatedWizard);
+
+        // When and then
+        this.mockMvc.perform(put("/api/v1/wizards/1").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("update Success"))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.name").value("Updated wizard name"));
 
     }
+    @Test
+    void testUpdateWizardErrorWithNonExistentId() throws Exception {
+        given(this.wizardService.update(eq(5), Mockito.any(Wizard.class))).willThrow(new ObjectNotFoundException("wizard", 5));
+        WizardDto wizardDto = new WizardDto(5, "Updated wizard name", 0);// This id does not exist in the database.
+
+        String json = this.objectMapper.writeValueAsString(wizardDto);
+
+        // When and then
+        this.mockMvc.perform(put( "/api/v1/wizards/5").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find wizard with Id 5 :("))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+
+
+
+
+    }
+
+
 }

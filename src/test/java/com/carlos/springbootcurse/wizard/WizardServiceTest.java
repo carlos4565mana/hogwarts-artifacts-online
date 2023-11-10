@@ -118,4 +118,43 @@ class WizardServiceTest {
         assertThat(returnedWizard.getName()).isEqualTo(newWizard.getName());
         verify(this.wizardRepository, times(1)).save(newWizard);
     }
+
+    @Test
+    void testUpdateSuccess(){
+        // Given
+        Wizard oldWizard = new Wizard();
+        oldWizard.setId(1);
+        oldWizard.setName("Albus Dumbledore");
+
+        Wizard update = new Wizard();
+        update.setName("Albus Dumbledore - update");
+
+        given(this.wizardRepository.findById(1)).willReturn(Optional.of(oldWizard));
+        given(this.wizardRepository.save(oldWizard)).willReturn(oldWizard);
+
+        // When
+        Wizard updatedWizard = this.wizardService.update(1, update);
+        assertThat(updatedWizard.getName()).isEqualTo(update.getName());
+        verify(this.wizardRepository, times(1)).findById(1);
+        verify(this.wizardRepository, times(1)).save(oldWizard);
+
+        //Then
+        assertThat(updatedWizard.getId()).isEqualTo(1);
+
+    }
+    @Test
+    void testUpdateNotFound(){
+        // Given
+        Wizard update = new Wizard();
+        update.setName("Albus Dumbledore - update");
+        given(this.wizardRepository.findById(1)).willReturn(Optional.empty());
+
+        //When
+        assertThrows(ObjectNotFoundException.class, () -> {
+            this.wizardService.update(1, update);
+        });
+        // Then
+        verify(this.wizardRepository, times(1)).findById(1);
+
+    }
 }
