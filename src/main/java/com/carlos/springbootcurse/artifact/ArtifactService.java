@@ -1,6 +1,7 @@
 package com.carlos.springbootcurse.artifact;
 
 import com.carlos.springbootcurse.artifact.utils.IdWorker;
+import com.carlos.springbootcurse.system.exception.ObjectNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class ArtifactService {
 
     public void delete(String artifactId ){
         this.artifactRepository.findById(artifactId)
-                .orElseThrow(()-> new ArtifactNotFoundException(artifactId));
+                .orElseThrow(()-> new ObjectNotFoundException("artifact",artifactId));
         this.artifactRepository.deleteById(artifactId);
 
     }

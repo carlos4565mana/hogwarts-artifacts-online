@@ -1,6 +1,7 @@
 package com.carlos.springbootcurse.artifact;
 
 import com.carlos.springbootcurse.artifact.utils.IdWorker;
+import com.carlos.springbootcurse.system.exception.ObjectNotFoundException;
 import com.carlos.springbootcurse.wizard.Wizard;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -204,7 +205,7 @@ class ArtifactServiceTest {
 
         given(artifactRepository.findById("1250808601744904192")).willReturn(Optional.empty());
 
-        assertThrows(ArtifactNotFoundException.class, ()->{
+        assertThrows(ObjectNotFoundException.class, ()->{
             artifactService.delete("1250808601744904192");
         });
 
