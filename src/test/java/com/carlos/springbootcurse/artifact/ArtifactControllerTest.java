@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class ArtifactControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -191,7 +191,7 @@ class ArtifactControllerTest {
         this.mockMvc.perform(put(this.baseUrl + "/artifacts/1250808601744904192").contentType(MediaType.APPLICATION_JSON).content(json).accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
-                .andExpect(jsonPath("$.message").value("Updated Success"))
+                .andExpect(jsonPath("$.message").value("Update Success"))
                 .andExpect(jsonPath("$.data.id").value("1250808601744904192"))
                 .andExpect(jsonPath("$.data.name").value(updateArtifact.getName()))
                 .andExpect(jsonPath("$.data.description").value(updateArtifact.getDescription()))

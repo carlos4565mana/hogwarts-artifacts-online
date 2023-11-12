@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,6 +29,8 @@ class UserServiceTest {
 
     @InjectMocks
     UserService userService;
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     List<User> users;
     @BeforeEach
@@ -121,6 +124,7 @@ class UserServiceTest {
 
     @Test
     void testSaveUserSuccess(){
+        //Given
         User newUser = new User();
 
         newUser.setUsername("lily");
@@ -128,8 +132,10 @@ class UserServiceTest {
         newUser.setEnabled(true);
         newUser.setRoles("user");
 
+        given(this.passwordEncoder.encode(newUser.getPassword())).willReturn("Encoded Password");
         given(this.userRepository.save(newUser)).willReturn(newUser);
 
+        //When
         User returnedUser = this.userService.save(newUser);
 
         // Then

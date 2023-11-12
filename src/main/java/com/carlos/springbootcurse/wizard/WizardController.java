@@ -54,7 +54,7 @@ public class WizardController {
         Wizard update = this.wizardDtoToWizardConverter.convert(wizardDto);
         Wizard updatedWizard = this.wizardService.update(wizardId, update);
         WizardDto updatedWizardDto = this.wizardToWizardDtoConverter.convert(updatedWizard);
-        return new Result(true, StatusCode.SUCCESS, "update Success",updatedWizardDto);
+        return new Result(true, StatusCode.SUCCESS, "Update Success",updatedWizardDto);
 
     }
 
